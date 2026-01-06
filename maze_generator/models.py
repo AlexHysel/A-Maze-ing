@@ -1,6 +1,7 @@
 #afomin
 
 from enum import Enum
+from typing import Tuple
 
 
 class Type(Enum):
@@ -15,25 +16,32 @@ class Cell:
     def __init__(self, bottom_wall=True, right_wall=True):
         self.bottom_wall = bottom_wall
         self.right_wall = right_wall
-        self.__axis = None
+        self.__type = None
 
-    def set_type(self, axis):
-        if axis >= 0 and axis <= 4:
-            self.__axis = Type(axis)
+    def set_type(self, new_type):
+        if new_type >= 0 and new_type <= 4:
+            self.__type = Type(new_type)
         else:
-            raise Exception("[ERROR] Invalid axis")
+            raise Exception("[ERROR] Invalid type")
 
-    def get_axis(self):
-        return self.__axis
+    def get_type(self):
+        return self.__type
 
 
 class Maze:
-    def __init__(self, width, height):
+    def __init__(self, width: int, height: int, entry_pt: Tuple[int, int], exit_pt: Tuple[int, int]):
         if height <= 0 or width <= 0:
             raise Exception("[ERROR] Maze width and height should be > 0.")
         self.__height = height
         self.__width = width
         self.__grid = [[Cell() for _ in range(width)] for _ in range(height)]
+        self.__entry = entry_pt
+        self.__exit = exit_pt
+
+        x, y = entry_pt
+        self.__grid[y][x].set_type(3)
+        x, y = exit_pt
+        self.__grid[y][x].set_type(4)
 
     def get(self, x, y):
         return self.__grid[y][x]
@@ -46,3 +54,9 @@ class Maze:
 
     def get_height(self):
         return self.__height
+
+    def get_entry(self):
+        return self.__entry
+
+    def get_exit(self):
+        return self.__exit

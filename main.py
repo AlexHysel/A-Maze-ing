@@ -1,18 +1,17 @@
 from maze_generator import Maze
 from maze_generator import MazeGenerator
-from maze_generator import TypeAssignmentPhase, Add42HeaderPhase
+from maze_generator import generation_phases as Phases
 from maze_generator import Config
 import sys
 
-config_path = input()
-config_path = "configs/" + config_path
+config_path = "configs/config_all.txt"
 config = Config.from_file(config_path)
 generator = MazeGenerator()
 
-generator.add_phase(Add42HeaderPhase())
-generator.add_phase(TypeAssignmentPhase())
-#generator.add_phase(PathBuildingPhase())
-#generator.add_phase(OnizukaPhase())
+generator.add_phase(Phases.Add42HeaderPhase())
+generator.add_phase(Phases.TypeAssignmentPhase(config.seed))
+# Dont do anything at the moment
+generator.add_phase(Phases.PathBuildingPhase())
+generator.add_phase(Phases.OnizukaPhase())
 
 maze = generator.generate(config, True)
-
