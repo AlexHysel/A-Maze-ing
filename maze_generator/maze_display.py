@@ -1,3 +1,5 @@
+#afomin
+
 from .models import Maze, Type
 
 

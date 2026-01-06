@@ -1,3 +1,5 @@
+#afomin
+
 from abc import ABC, abstractmethod
 from .maze_display import MazeRenderer
 from .models import Type

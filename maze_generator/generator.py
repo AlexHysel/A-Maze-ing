@@ -1,5 +1,8 @@
+#afomin
+
 from .models import Maze
 from .generation_phases import GenerationPhase
+from .config import Config
 
 
 class MazeGenerator():
@@ -13,10 +16,10 @@ class MazeGenerator():
             raise Exception("[ERROR] All generation phases should be" +
                   "subclasses of GenerationPhase.")
 
-    def generate(self, width, height, is_perfect, log=False):
-        maze = Maze(width, height)
-        maze.get(0, 0).set_type(3)
-        maze.get(width - 1, height - 1).set_type(4)
+    def generate(self, config: Config, log=False):
+        maze = Maze(config.width, config.height)
+        maze.get(*config.entry_pt).set_type(3)
+        maze.get(*config.exit_pt).set_type(4)
         for phase_id, phase in enumerate(self.__phases):
             maze = phase.apply(maze, log, phase_id)
         return maze
