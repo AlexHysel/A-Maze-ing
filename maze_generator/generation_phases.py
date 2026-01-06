@@ -67,7 +67,7 @@ class Add42HeaderPhase(GenerationPhase):
             maze.get(x + 6, y + 4).set_type(2)
 
         elif log:
-            raise Exception(f'Cencelled, maze less than 5x7.')
+            print(f'Cencelled, maze less than 5x7.')
         return maze
 
 

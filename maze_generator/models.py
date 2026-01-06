@@ -26,14 +26,12 @@ class Cell:
 
 
 class Maze:
-    def __init__(self, width, height, start, finish):
+    def __init__(self, width, height):
         if height <= 0 or width <= 0:
             raise Exception("[ERROR] Maze width and height should be > 0.")
         self.__height = height
         self.__width = width
         self.__grid = [[Cell() for _ in range(width)] for _ in range(height)]
-        self.__start = start
-        self.__finish = finish
 
     def get(self, x, y):
         return self.__grid[y][x]
