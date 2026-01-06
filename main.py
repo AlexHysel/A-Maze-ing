@@ -10,8 +10,6 @@ generator = MazeGenerator()
 
 generator.add_phase(Phases.Add42HeaderPhase())
 generator.add_phase(Phases.TypeAssignmentPhase(config.seed))
-# Dont do anything at the moment
 generator.add_phase(Phases.PathBuildingPhase())
-generator.add_phase(Phases.OnizukaPhase())
 
 maze = generator.generate(config, True)
