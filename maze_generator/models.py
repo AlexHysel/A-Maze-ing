@@ -7,9 +7,9 @@ from typing import Tuple
 class Type(Enum):
     HORIZONTAL = 0
     VERTICAL = 1
-    NO_AXIS = 2
-    START = 3
-    FINISH = 4
+    ISOLATED = 2
+    EXIT = 3
+    ENTRY = 4
 
 
 class Cell:
