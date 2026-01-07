@@ -1,5 +1,6 @@
 #afomin
 
+from typing import Set
 from abc import ABC, abstractmethod
 from .maze_display import MazeRenderer
 from .models import Type
@@ -11,16 +12,16 @@ def log_phase(func):
         if log:
             print(f'[PHASE {phase_id}] {self.__class__.__name__} started.')
         
-        #try:
+        try:
             result = func(self, maze, log, phase_id)
 
-        #except Exception as e:
-        #    print(f'[PHASE {phase_id}]', e)
+        except Exception as e:
+            print(f'[PHASE {phase_id}]', e)
 
-        #else:
-        #    if log:
-        #        print(f'[PHASE {phase_id}] Finished successfully.')
-        #        MazeRenderer.display(result, True)
+        else:
+            if log:
+                print(f'[PHASE {phase_id}] Finished successfully.')
+                MazeRenderer.display(result, True)
             return result
 
     return wrapper
@@ -94,9 +95,9 @@ class PathBuildingPhase(GenerationPhase):
         for direction, position in neighbours.items():
             if position not in visited:
                 cell_type = maze.get(*position).get_type()
-                if direction in ['right', 'left'] and cell_type == Type.HORIZONTAL:
+                if direction in ['right', 'left'] and (cell_type == Type.HORIZONTAL or cell_type == Type.FINISH):
                     return position
-                if direction in ['bottom', 'top'] and cell_type == Type.VERTICAL:
+                if direction in ['bottom', 'top'] and (cell_type == Type.VERTICAL or cell_type == Type.FINISH):
                     return position
         return None
 
@@ -126,41 +127,42 @@ class PathBuildingPhase(GenerationPhase):
 
         return neighbours
 
+    def _break_frontier(self, maze, visited):
+        for inner_pos in visited:
+            if maze.get(*inner_pos).get_type() == Type.NO_AXIS:
+                continue
+            neighbours = self._neighbour_cells(maze, *inner_pos)
+            for direction, outer_pos in neighbours.items():
+                if outer_pos not in visited:
+                    visited.add(outer_pos)
+                    self._break_wall(maze, *outer_pos, *inner_pos)
+                    return outer_pos
+
+    def _fill_with_unreachable(self, maze, visited):
+        for y in range(maze.get_height()):
+            for x in range(maze.get_width()):
+                if maze.get(x, y).get_type() == Type.NO_AXIS:
+                    visited.add((x, y))
+
     @log_phase
     def apply(self, maze, log: bool, phase_id: int):
         route = [maze.get_entry()]
         visited = set()
+        self._fill_with_unreachable(maze, visited)
         cell_count = maze.get_width() * maze.get_height()
 
         while len(visited) < cell_count:
-            if len(route) == 0:
-                found = False
-                for y, row in enumerate(maze.get_grid()):
-                    for x, cell in enumerate(row):
-                        if (x, y) not in visited:
-                            neighbours = self._neighbour_cells(maze, x, y).values()
-                            for neighbour in neighbours:
-                                if neighbour in visited:
-                                    self._break_wall(maze, *neighbour, x, y)
-                                    route.append(neighbour)
-                                    found = True       
-                                    break
-                        if found:
-                            break
-                    if found:
-                        break
+            if not route:
+                route.append(self._break_frontier(maze, visited))
+            carver_pos = route[-1]
 
-            curr_cell = route[-1]
-
-            MazeRenderer.display(maze, True)
-
-            visited.add(curr_cell)
-            neighbours = self._neighbour_cells(maze, *curr_cell)
+            visited.add(carver_pos)
+            neighbours = self._neighbour_cells(maze, *carver_pos)
             next_cell = self._next_cell(maze, neighbours, visited)
 
             if next_cell is None:
                 route.pop()
             else:
-                self._break_wall(maze, *next_cell, *curr_cell)
+                self._break_wall(maze, *next_cell, *carver_pos)
                 route.append(next_cell)
         return maze
