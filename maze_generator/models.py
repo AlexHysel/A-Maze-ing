@@ -8,8 +8,8 @@ class Type(Enum):
     HORIZONTAL = 0
     VERTICAL = 1
     ISOLATED = 2
-    EXIT = 3
-    ENTRY = 4
+    ENTRY = 3
+    EXIT = 4
 
 
 class Cell:
@@ -18,9 +18,9 @@ class Cell:
         self.right_wall = right_wall
         self.__type = None
 
-    def set_type(self, new_type):
-        if new_type >= 0 and new_type <= 4:
-            self.__type = Type(new_type)
+    def set_type(self, new_type: Type):
+        if isinstance(new_type, Type):
+            self.__type = new_type
         else:
             raise Exception("[ERROR] Invalid type")
 
@@ -39,9 +39,9 @@ class Maze:
         self.__exit = exit_pt
 
         x, y = entry_pt
-        self.__grid[y][x].set_type(3)
+        self.__grid[y][x].set_type(Type.ENTRY)
         x, y = exit_pt
-        self.__grid[y][x].set_type(4)
+        self.__grid[y][x].set_type(Type.EXIT)
 
     def get(self, x, y):
         return self.__grid[y][x]

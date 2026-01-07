@@ -25,5 +25,5 @@ class MazeGenerator():
             maze = phase.apply(maze)
             if log:
                 print(f'[PHASE {phase_id}]', phase.get_finish_message())
-                MazeRenderer.display(maze, True)
+                MazeRenderer.display(maze, False)
         return maze

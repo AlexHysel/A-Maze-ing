@@ -8,6 +8,11 @@ import random
 # === Basic phase ===
 
 class GenerationPhase(ABC):
+    _GREEN = '\033[92m'
+    _YELLOW = '\033[93m'
+    _RED = '\033[91m'
+    _RESET = '\033[0m'
+
     def __init__(self):
         self._start_message = f'{self.__class__.__name__} started.'
         self._finish_message = f'{self.__class__.__name__} finished.'
@@ -31,7 +36,7 @@ class GenerationPhase(ABC):
 class Add42HeaderPhase(GenerationPhase):
     def __init__(self):
         self._start_message = 'Adding 42 Header...'
-        self._finish_message = '42 Header added.'
+        self._finish_message = f'{self._GREEN}42 Header added.{self._RESET}'
 
     def apply(self, maze):
         h = maze.get_height()
@@ -53,15 +58,15 @@ class Add42HeaderPhase(GenerationPhase):
             # Validation
             for pos in header_positions:
                 if maze.get(*pos).get_type() is not None:
-                    self._finish_message = f'Cencelled, {pos} already has type.'
+                    self._finish_message = f'{self._YELLOW}Cancelled, {pos} already has type.{self._RESET}'
                     return maze
 
             # Assignment
             for pos in header_positions:
-                maze.get(*pos).set_type(2)
+                maze.get(*pos).set_type(Type.ISOLATED)
 
         else:
-            self._finish_message = f'Cencelled, maze less than 5x7.'
+            self._finish_message = f'{self._YELLOW}Cancelled, maze less than 5x7.{self._RESET}'
         return maze
 
 
@@ -70,7 +75,7 @@ class Add42HeaderPhase(GenerationPhase):
 class TypeAssignmentPhase(GenerationPhase):
     def __init__(self, seed = None):
         self._start_message = f'Axis assignment...'
-        self._finish_message = f'Finished successfully.'
+        self._finish_message = f'{self._GREEN}Finished successfully.{self._RESET}'
         if seed is not None:
             random.seed(seed)
 
@@ -78,7 +83,7 @@ class TypeAssignmentPhase(GenerationPhase):
         for row in maze.get_grid():
             for cell in row:
                 if cell.get_type() is None:
-                    cell.set_type(random.randint(0, 1))
+                    cell.set_type(Type(random.randint(0, 1)))
         return maze
 
 
@@ -89,10 +94,10 @@ class TypeAssignmentPhase(GenerationPhase):
 class PathBuildingPhase(GenerationPhase):
     def __init__(self):
         self._start_message = 'Carving path...'
-        self._finish_message = 'All paths carved.'
+        self._finish_message = f'{self._GREEN}All paths carved.{self._RESET}'
 
     # Returns accessable cell where carver can go
-    def _next_cell(self, maze, neighbours, visited):
+    def _next_pos(self, maze, neighbours, visited):
         grid = maze.get_grid()
 
         for direction, position in neighbours.items():
@@ -107,7 +112,7 @@ class PathBuildingPhase(GenerationPhase):
                         return position
         return None
 
-    # Breaks wall between next_cell and carver_cell
+    # Breaks wall between next_pos and carver_cell
     def _break_wall(self, maze, n_x, n_y, x, y):
         if n_y - y == 1:
             maze.get(x, y).bottom_wall = False
@@ -169,11 +174,11 @@ class PathBuildingPhase(GenerationPhase):
 
             visited.add(carver_pos)
             neighbours = self._neighbour_cells(maze, *carver_pos)
-            next_cell = self._next_cell(maze, neighbours, visited)
+            next_pos = self._next_pos(maze, neighbours, visited)
 
-            if next_cell is None:
+            if next_pos is None:
                 route.pop()
             else:
-                self._break_wall(maze, *next_cell, *carver_pos)
-                route.append(next_cell)
+                self._break_wall(maze, *next_pos, *carver_pos)
+                route.append(next_pos)
         return maze
