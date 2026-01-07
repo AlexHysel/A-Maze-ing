@@ -5,7 +5,7 @@ from .models import Maze, Type
 
 class MazeRenderer:
     @staticmethod
-    def display(maze, show_type=False):
+    def display(maze, show_axis=False):
         grid = maze.get_grid()
         height = len(grid)
         width = len(grid[0]) if height > 0 else 0
@@ -20,7 +20,7 @@ class MazeRenderer:
                 
                 symbol = " "
                 ax = cell.get_type()
-                if show_type:
+                if show_axis:
                     mapping = {
                         Type.HORIZONTAL: "-",
                         Type.VERTICAL: "|"

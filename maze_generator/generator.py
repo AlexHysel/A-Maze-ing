@@ -2,6 +2,7 @@
 
 from .models import Maze
 from .generation_phases import GenerationPhase
+from .maze_display import MazeRenderer
 from .config import Config
 
 
@@ -19,5 +20,10 @@ class MazeGenerator():
     def generate(self, config: Config, log=False):
         maze = Maze(config.width, config.height, config.entry_pt, config.exit_pt)
         for phase_id, phase in enumerate(self.__phases):
-            maze = phase.apply(maze, log, phase_id)
+            if log:
+                print(f'[PHASE {phase_id}]', phase.get_start_message())
+            maze = phase.apply(maze)
+            if log:
+                print(f'[PHASE {phase_id}]', phase.get_finish_message())
+                MazeRenderer.display(maze, True)
         return maze

@@ -1,48 +1,36 @@
 #afomin
 
-from typing import Set
 from abc import ABC, abstractmethod
-from .maze_display import MazeRenderer
 from .models import Type
 import random
-
-
-def log_phase(func):
-    def wrapper(self, maze, log, phase_id):
-        if log:
-            print(f'[PHASE {phase_id}] {self.__class__.__name__} started.')
-        
-        try:
-            result = func(self, maze, log, phase_id)
-
-        except Exception as e:
-            print(f'[PHASE {phase_id}]', e)
-
-        else:
-            if log:
-                print(f'[PHASE {phase_id}] Finished successfully.')
-                MazeRenderer.display(result, True)
-            return result
-
-    return wrapper
 
 
 # === Basic phase ===
 
 class GenerationPhase(ABC):
     def __init__(self):
-        pass
+        self._start_message = f'{self.__class__.__name__} started.'
+        self._finish_message = f'{self.__class__.__name__} finished.'
 
     @abstractmethod
-    def apply(self, maze, log, phase_id):
+    def apply(self, maze):
         pass
+
+    def get_start_message(self):
+        return self._start_message
+
+    def get_finish_message(self):
+        return self._finish_message
 
 
 # === Phases ===
 
 class Add42HeaderPhase(GenerationPhase):
-    @log_phase
-    def apply(self, maze, log, phase_id):
+    def __init__(self):
+        self._start_message = 'Adding 42 Header...'
+        self._finish_message = '42 Header added.'
+
+    def apply(self, maze):
         h = maze.get_height()
         w = maze.get_width()
         if h >= 5 and w >= 7:
@@ -69,18 +57,19 @@ class Add42HeaderPhase(GenerationPhase):
             maze.get(x + 5, y + 4).set_type(2)
             maze.get(x + 6, y + 4).set_type(2)
 
-        elif log:
-            print(f'Cencelled, maze less than 5x7.')
+        else:
+            self._finish_message = f'Cencelled, maze less than 5x7.'
         return maze
 
 
 class TypeAssignmentPhase(GenerationPhase):
     def __init__(self, seed = None):
+        self._start_message = f'Axis assignment...'
+        self._finish_message = f'Finished successfully.'
         if seed is not None:
             random.seed(seed)
 
-    @log_phase
-    def apply(self, maze, log, phase_id):
+    def apply(self, maze):
         for row in maze.get_grid():
             for cell in row:
                 if cell.get_type() is None:
@@ -89,6 +78,10 @@ class TypeAssignmentPhase(GenerationPhase):
 
 
 class PathBuildingPhase(GenerationPhase):
+    def __init__(self):
+        self._start_message = 'Carving path...'
+        self._finish_message = 'All paths carved.'
+
     def _next_cell(self, maze, neighbours, visited):
         grid = maze.get_grid()
 
@@ -144,8 +137,7 @@ class PathBuildingPhase(GenerationPhase):
                 if maze.get(x, y).get_type() == Type.NO_AXIS:
                     visited.add((x, y))
 
-    @log_phase
-    def apply(self, maze, log: bool, phase_id: int):
+    def apply(self, maze):
         route = [maze.get_entry()]
         visited = set()
         self._fill_with_unreachable(maze, visited)
