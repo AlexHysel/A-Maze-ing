@@ -92,24 +92,33 @@ class TypeAssignmentPhase(GenerationPhase):
 # and breaks the walls.
 
 class PathBuildingPhase(GenerationPhase):
-    def __init__(self):
+    def __init__(self, is_perfect = True):
         self._start_message = 'Carving path...'
         self._finish_message = f'{self._GREEN}All paths carved.{self._RESET}'
+        self._is_perfect = is_perfect
 
     # Returns accessable cell where carver can go
     def _next_pos(self, maze, neighbours, visited):
         grid = maze.get_grid()
+        directions = list(neighbours)
+        random.shuffle(directions)
 
-        for direction, position in neighbours.items():
+        for direction in directions:
+            position = neighbours[direction]
             if position not in visited:
                 c_type = maze.get(*position).get_type()
-
                 if direction in ['right', 'left']:
                     if c_type == Type.HORIZONTAL or c_type == Type.EXIT:
                         return position
                 elif direction in ['bottom', 'top']: 
                     if c_type == Type.VERTICAL or c_type == Type.EXIT:
                         return position
+
+            # If its not perfect there is 3% chance to break the wall anyway
+            elif (not self._is_perfect
+                  and random.random() < 0.03
+                  and maze.get(*position).get_type() is not Type.ISOLATED):
+                return position
         return None
 
     # Breaks wall between next_pos and carver_cell
