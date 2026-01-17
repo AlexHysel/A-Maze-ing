@@ -120,10 +120,10 @@ class Config:
         return i
 
     @staticmethod
-    def _parse_seed(s_str: str) -> str | int:
+    def _parse_seed(s_str: str) -> str | int | None:
         """use for seed on config parser"""
         if s_str.strip().lower() == 'random':
-            return 'random'
+            return None
         return int(s_str.strip())
 
     @staticmethod
@@ -168,11 +168,8 @@ class Config:
         print(f"output_file: {self.output_file}")
         print(f"dimensions: {self.width} x {self.height}")
         print(
-            f"entry cell: {self.entry_pt % self.width} x " +
-            f"{self.entry_pt // self.width}")
+            f"entry cell: {self.entry_pt}")
         print(
-            f"exit cell: {self.exit_pt % self.width} x " +
-            f"{self.exit_pt // self.width}")
+            f"exit cell: {self.exit_pt}")
         print(f"is_perfect: {self.is_perfect}")
         print(f"seed: {self.seed}")
-

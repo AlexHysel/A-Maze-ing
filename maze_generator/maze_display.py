@@ -1,48 +1,66 @@
-#afomin
+# afomin
 
-from .models import Maze, Type
+from .models import Maze, CellType, Cell
 
 
 class MazeRenderer:
     @staticmethod
-    def display(maze, show_axis=False):
-        BLUE = '\033[94m'
-        RED = '\033[41m'
-        GREEN = '\033[42m'
-        RESET = '\033[0m'
+    def display(maze: Maze, show_axis=False):
+        BLUE: str = '\033[94m'
+        RED: str = '\033[41m'
+        GREEN: str = '\033[42m'
+        RESET: str = '\033[0m'
 
-        grid = maze.get_grid()
-        height = len(grid)
-        width = len(grid[0]) if height > 0 else 0
+        grid: list[list[Cell]] = maze.get_grid()
+        height: int = len(grid)
+        width: int = len(grid[0]) if height > 0 else 0
 
         print("+" + "---+" * width)
 
         for y in range(height):
-            row_str = "|" 
-            
+            row_str: str = "|"
+
             for x in range(width):
-                cell = grid[y][x]
-                
-                cell_type = cell.get_type()
-                mapping = {
-                    Type.ISOLATED: f"{BLUE}@{RESET}",
-                    Type.ENTRY: f"{RED}S{RESET}",
-                    Type.EXIT: f"{GREEN}X{RESET}"
+                cell: Cell = grid[y][x]
+
+                cell_type: CellType = cell.get_type()
+                mapping: dict[CellType, str] = {
+                    CellType.ISOLATED: f"{BLUE}@{RESET}",
+                    CellType.ENTRY: f"{RED}S{RESET}",
+                    CellType.EXIT: f"{GREEN}X{RESET}",
+                    CellType.PATH: "."
                 }
                 if show_axis:
-                    mapping[Type.HORIZONTAL] = '-'
-                    mapping[Type.VERTICAL] = '|'
+                    mapping[CellType.HORIZONTAL] = '-'
+                    mapping[CellType.VERTICAL] = '|'
 
-                symbol = mapping.get(cell_type, " ")
+                symbol: str = mapping.get(cell_type, " ")
                 row_str += f" {symbol} "
-                
+
                 row_str += "|" if cell.right_wall else " "
-            
+
             print(row_str)
 
-            bottom_str = "+"
+            bottom_str: str = "+"
             for x in range(width):
                 cell = grid[y][x]
                 bottom_str += "---" if cell.bottom_wall else "   "
                 bottom_str += "+"
-            print(bottom_str) 
+            print(bottom_str)
+
+    @staticmethod
+    def print_formatted_output(maze: Maze) -> None:
+        grid: list[list[Cell]] = maze.get_grid()
+        height: int = len(grid)
+        width: int = len(grid[0]) if height > 0 else 0
+        x: int
+        y: int
+        for y in range(height):
+            for x in range(width):
+                print(maze.get_hex_of_cell(x, y), end="")
+            print()
+        print()
+        x, y = maze.get_entry()
+        print(x, ", ", y, sep="")
+        x, y = maze.get_exit()
+        print(x, ", ", y, sep="")
