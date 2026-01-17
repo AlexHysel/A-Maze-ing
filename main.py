@@ -4,6 +4,7 @@
 from maze_generator import MazeGenerator
 from maze_generator import generation_phases as Phases
 from maze_generator import Config
+from maze_solver.maze_solver import MazeSolver
 import sys
 
 if (len(sys.argv) > 1):
@@ -30,6 +31,7 @@ if (len(sys.argv) > 1):
     while not user_input == 'exit' and not user_input == '4':
         if user_input == '1':
             maze = generator.generate(config)
+            print(MazeSolver.shortest_path(maze))
         if user_input == '2':
             maze = generator.generate(config, True)
         if user_input == '3':

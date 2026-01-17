@@ -267,7 +267,7 @@ class PathBuildingPhase(GenerationPhase):
         return outer_pos
 
     # Adds header to visited to prevent any
-    # actions on them
+    # actions on it
     def _fill_with_unreachable(
             self,
             maze: Maze,
