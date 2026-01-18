@@ -86,11 +86,11 @@ class TypeAssignmentPhase(GenerationPhase):
                 f'{self._GREEN}' +
                 f'Finished successfully.{self._RESET}'
                 )
-        print(seed)
-        if seed is not None:
-            random.seed(seed)
+        self._seed = seed
 
     def apply(self, maze: Maze):
+        if self._seed is not None:
+            random.seed(self._seed)
         for row in maze.get_grid():
             for cell in row:
                 if cell.get_type() is CellType.NOTYPE:

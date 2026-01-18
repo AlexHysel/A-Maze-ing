@@ -17,7 +17,7 @@ class MazeGenerator():
             raise Exception("[ERROR] All generation phases should be" +
                   "subclasses of GenerationPhase.")
 
-    def generate(self, config: Config, log=False, show_axis=False):
+    def generate(self, config: Config, renderer: MazeRenderer = None):
         maze: Maze = Maze(
                 config.width,
                 config.height,
@@ -25,11 +25,10 @@ class MazeGenerator():
                 config.exit_pt
                 )
         for phase_id, phase in enumerate(self.__phases):
-            if log:
+            if renderer is not None:
                 print(f'[PHASE {phase_id}]', phase.get_start_message())
             maze = phase.apply(maze)
-            if log:
+            if renderer is not None:
                 print(f'[PHASE {phase_id}]', phase.get_finish_message())
-                MazeRenderer.display(maze, show_axis)
-        MazeRenderer.print_formatted_output(maze)
+                renderer.display(maze, True)
         return maze

@@ -39,13 +39,14 @@ class Maze:
         width: int,
         height: int,
         entry_pt: tuple[int, int],
-        exit_pt: tuple[int, int]
+        exit_pt: tuple[int, int],
+        grid: list[list[Cell]] | None = None
     ) -> None:
         if height <= 0 or width <= 0:
             raise Exception("[ERROR] Maze width and height should be > 0.")
         self.__height: int = height
         self.__width: int = width
-        self.__grid: list[list[Cell]] = [
+        self.__grid: list[list[Cell]] = grid if grid is not None else [
                 [Cell() for _ in range(width)]
                 for _ in range(height)
                 ]
@@ -56,6 +57,15 @@ class Maze:
         self.__grid[y][x].set_type(CellType.ENTRY)
         x, y = exit_pt
         self.__grid[y][x].set_type(CellType.EXIT)
+
+    def copy(self) -> "Maze":
+        return type(self)(
+                self.get_width(),
+                self.get_height(),
+                self.get_entry(),
+                self.get_exit(),
+                self.get_grid()
+                )
 
     def get_cell(self, x: int, y: int) -> Cell:
         return self.__grid[y][x]
