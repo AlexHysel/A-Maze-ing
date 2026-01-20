@@ -1,0 +1,19 @@
+# this is a comments
+# this is a comments
+# this is a comments
+# this is a comments
+
+
+
+WIDTH=16
+HEIGHT=16
+ENTRY=1, 1
+EXIT=13, 12
+OUTPUT_FILE=maze.txt
+PERFECT=False
+SEED=42
+
+
+# this is a comments
+# this is a comments
+# this is a comments

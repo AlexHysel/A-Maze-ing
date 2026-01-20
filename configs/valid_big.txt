@@ -5,13 +5,13 @@
 
 
 
-WIDTH=16
-HEIGHT=16
+WIDTH=20
+HEIGHT=20
 ENTRY=1, 1
-EXIT=13, 12
-OUTPUT_FILE=maze_all.txt
-PERFECT=False
-SEED=42
+EXIT=16, 19
+OUTPUT_FILE=maze.txt
+PERFECT=True
+SEED=23
 
 
 # this is a comments
